@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { getUserById } from "./services/getUserById";
 
 interface MemberDetailEntity {
   id: string;
@@ -29,9 +30,7 @@ export const DetailPage: React.FC = () => {
   const [user, setUser] = useState<MemberDetailEntity>(createDefaultMemberDetail());
 
   useEffect(() => {
-    fetch(`https://api.github.com/user/${id}`)
-      .then((response) => response.json())
-      .then((json) => setUser(json));
+    getUserById({id}).then((user) => setUser(user))
   }, [])
 
   return (

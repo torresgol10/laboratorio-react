@@ -1,12 +1,11 @@
-import { create } from 'zustand'
+import { useContext } from "react";
+import { Store, StoreContext } from "../context";
 
-type Store = {
-  searchStore: string
-  updateSearchStore: (newSearchStore) => void
-}
 
-export const useStore = create<Store>((set) => ({
-  searchStore: "lemoncode",
-  updateSearchStore: (newSearch) => set({ searchStore: newSearch  }),
-}))
-
+export const useStore = (): Store => {
+  const context = useContext(StoreContext);
+  if (context === undefined) {
+    throw new Error('useStore must be used within a StoreProvider');
+  }
+  return context;
+};

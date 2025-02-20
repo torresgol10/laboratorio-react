@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import useDebounce from "./hooks/useDebounce";
 import { useStore } from "./hooks/useStore";
+import { getOrgsBySearch } from "./services/getOrgsBySearch";
+import HeaderTable from "./HeaderTable";
+import RowTable from "./RowTable";
 
 interface MemberEntity {
   id: string;
@@ -13,15 +16,13 @@ export const ListPage: React.FC = () => {
   const [members, setMembers] = React.useState<MemberEntity[]>([]);
   const { searchStore, updateSearchStore } = useStore()
 
-  const [search, setSearch ] = useState(searchStore)
+  const [search, setSearch] = useState(searchStore)
 
   const debouncedSearch = useDebounce(search, 800)
 
   React.useEffect(() => {
-    fetch(`https://api.github.com/orgs/${debouncedSearch}/members`)
-      .then((response) => response.json())
-      .then((json) => setMembers(json));
-      updateSearchStore(debouncedSearch)
+    getOrgsBySearch({ debouncedSearch }).then((json) => setMembers(json));
+    updateSearchStore(debouncedSearch)
   }, [debouncedSearch]);
 
   return (
@@ -31,15 +32,9 @@ export const ListPage: React.FC = () => {
         <input type="text" defaultValue={search} value={search} onChange={(e) => setSearch(e.target.value)} />
       </form>
       <div className="list-user-list-container">
-        <span className="list-header">Avatar</span>
-        <span className="list-header">Id</span>
-        <span className="list-header">Name</span>
+        <HeaderTable />
         {members.length > 0 && members.map((member) => (
-          <>
-            <img src={member.avatar_url} />
-            <span>{member.id}</span>
-            <Link to={`/detail/${member.id}`}>{member.login}</Link>
-          </>
+          <RowTable key={member.id} member={member} />
         ))}
       </div>
       <Link to="/detail">Navigate to detail page</Link>
